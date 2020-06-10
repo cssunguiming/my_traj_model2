@@ -236,7 +236,7 @@ def main(Epoch=5, Bert_Pretrain=False, Pretrained=False, Batch_size=2, log=None)
     run(Epoch, model, optimizer, device, train_data, train_traj_idx, test_data, test_traj_idx, log, Batch_size)
 
 if __name__ == "__main__":
-    main(Epoch=50, Bert_Pretrain=False, Batch_size=10, Pretrained=False, log='predict')
+    main(Epoch=100, Bert_Pretrain=False, Batch_size=10, Pretrained=False, log='predict')
     pass
 
 
