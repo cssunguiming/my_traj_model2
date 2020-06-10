@@ -2,16 +2,31 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 
-def cal_loss_performance(logit1=None, logit2=None, label1=None, label2=None, Predict=False):
+def cal_loss_performance(logit1=None, logit2=None, label1=None, label2=None, Predict=False, smoothing=True):
 
     if Predict:
         n = (label1.ne(0)).sum().item()
 
-        loss_place = F.cross_entropy(logit1, label1, reduction='mean', ignore_index=0)
+
         n_cor = (label1.ne(0) * label1.eq(logit1.argmax(-1))).sum().item()
 
-        loss_time = F.cross_entropy(logit2, label2, reduction='mean', ignore_index=0)
+        # loss_time = F.cross_entropy(logit2, label2, reduction='mean', ignore_index=0)
         n_time_cor = (label1.ne(0) * label2.eq(logit2.argmax(-1))).sum().item()
+
+        if smoothing:
+            eps = 0.1
+            n_class = logit1.size(1)
+
+            one_hot = torch.zeros_like(logit1).scatter(1, label1.view(-1, 1), 1)
+            one_hot = one_hot * (1 - eps) + (1 - one_hot) * eps / (n_class - 1)
+            log_prb = F.log_softmax(logit1, dim=1)
+
+            non_pad_mask = label1.ne(0)
+            loss_place = -(one_hot * log_prb).sum(dim=1)
+            loss_place = loss_place.masked_select(non_pad_mask).sum()  # average later
+        else:
+            loss_place = F.cross_entropy(logit1, label1, reduction='mean', ignore_index=0)
+        
 
         # a1 = logit1.argmax(-1)
         # a2 = label1

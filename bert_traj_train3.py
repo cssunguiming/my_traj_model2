@@ -198,7 +198,12 @@ def main(Epoch=5, Bert_Pretrain=False, Pretrained=False, Batch_size=2, log=None)
     head_n = 12
     d_model = 768
     N_layers = 12
-    dropout = 0.2
+    dropout = 0.3
+
+    # head_n = 10
+    # d_model = 400
+    # N_layers = 10
+    # dropout = 0.1
 
     print('*'*150)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -236,7 +241,7 @@ def main(Epoch=5, Bert_Pretrain=False, Pretrained=False, Batch_size=2, log=None)
     run(Epoch, model, optimizer, device, train_data, train_traj_idx, test_data, test_traj_idx, log, Batch_size)
 
 if __name__ == "__main__":
-    main(Epoch=50, Bert_Pretrain=False, Batch_size=10, Pretrained=False, log='predict')
+    main(Epoch=100, Bert_Pretrain=False, Batch_size=10, Pretrained=False, log='predict')
     pass
 
 
