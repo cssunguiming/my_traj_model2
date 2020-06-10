@@ -193,12 +193,12 @@ def run(epoch, model, optimizer, device, train_data, train_traj_idx, valid_data,
             # writer.add_scalars("Lr", {"Train": optimizer._print_lr()}, epoch_i)
 
 
-def main(Epoch=5, Bert_Pretrain=False, Pretrained=False, Batch_size=2, log=None):
+def main(Epoch=100, Bert_Pretrain=False, Batch_size=12, Pretrained=False, log='predict'):
 
     head_n = 12
     d_model = 768
     N_layers = 12
-    dropout = 0.3
+    dropout = 0.2
 
     # head_n = 10
     # d_model = 400
@@ -241,7 +241,7 @@ def main(Epoch=5, Bert_Pretrain=False, Pretrained=False, Batch_size=2, log=None)
     run(Epoch, model, optimizer, device, train_data, train_traj_idx, test_data, test_traj_idx, log, Batch_size)
 
 if __name__ == "__main__":
-    main(Epoch=100, Bert_Pretrain=False, Batch_size=10, Pretrained=False, log='predict')
+    main()
     pass
 
 

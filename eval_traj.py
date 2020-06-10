@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 
-def cal_loss_performance(logit1=None, logit2=None, label1=None, label2=None, Predict=False, smoothing=True):
+def cal_loss_performance(logit1=None, logit2=None, label1=None, label2=None, Predict=False, smoothing=False):
 
     if Predict:
         n = (label1.ne(0)).sum().item()

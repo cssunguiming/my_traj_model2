@@ -80,9 +80,15 @@ class Bert_Traj_Model(nn.Module):
         mask_next = (1 - torch.triu(torch.ones((1, len_s, len_s), device=x.device), diagonal=1)).bool()
         # mask = mask_pad & mask_next
 
-        mask_next[:,:, :len_traj] = True
+        # mask_next[:,:, :len_traj] = True
 
-        mask = mask_next & mask_pad 
+        # mask = mask_next & mask_pad 
+
+        mask_time = ((time.unsqueeze(-1))==(time.unsqueeze(1)))
+        mask_time[:,:len_traj,:len_traj] = True
+        mask_time[:,len_traj:,len_traj:] = True
+        mask_next[:,:, :len_traj] = True
+        mask = mask_next & mask_pad & mask_time
 
         
         x = self.Embed(x, time)
