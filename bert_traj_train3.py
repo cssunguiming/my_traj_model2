@@ -193,7 +193,7 @@ def run(epoch, model, optimizer, device, train_data, train_traj_idx, valid_data,
             # writer.add_scalars("Lr", {"Train": optimizer._print_lr()}, epoch_i)
 
 
-def main(Epoch=100, Bert_Pretrain=False, Batch_size=12, Pretrained=False, log='predict'):
+def main(Epoch=100, Bert_Pretrain=False, Batch_size=8, Pretrained=False, log='predict'):
 
     head_n = 12
     d_model = 768
