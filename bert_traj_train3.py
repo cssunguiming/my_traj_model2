@@ -210,7 +210,7 @@ def main(Epoch=200, Bert_Pretrain=False, Batch_size=10, Pretrained=False, log='p
     print("Device:", device)
     print("Get Dataset")
     dataset_4qs = pickle.load(open('./data/tweets-cikm.txtfoursquare.pk', 'rb'))
-    print("User number: ", len(dataset_4qs['uidx_list']))
+    print("User number: ", len(dataset_4qs['uid_list']))
     print("Generate Train_traj_list")
     train_data, train_traj_idxx = generate_input_history(data_neural=dataset_4qs["data_neural"], mode="train")
     print("Generate Validx_traj_list")
@@ -218,14 +218,14 @@ def main(Epoch=200, Bert_Pretrain=False, Batch_size=10, Pretrained=False, log='p
 
     if Bert_Pretrain:
         print("Loaded Pretrained Bert")      
-        Bert = Bert_Traj_Model(token_size=len(dataset_4qs['vidx_list']), head_n=head_n, d_model=d_model, N_layers=N_layers, dropout=dropout)
+        Bert = Bert_Traj_Model(token_size=len(dataset_4qs['vid_list']), head_n=head_n, d_model=d_model, N_layers=N_layers, dropout=dropout)
         Bert.load_state_dict(torch.load('./pretrain/bert_trained_ep14.pth')) 
     else: 
         print("Create New Bert")      
-        Bert = Bert_Traj_Model(token_size=len(dataset_4qs['vidx_list']), head_n=head_n, d_model=d_model, N_layers=N_layers, dropout=dropout)
+        Bert = Bert_Traj_Model(token_size=len(dataset_4qs['vid_list']), head_n=head_n, d_model=d_model, N_layers=N_layers, dropout=dropout)
 
     print("Get Predict Model")
-    model = Predict_Model(Bert, token_size=len(dataset_4qs['vidx_list']), head_n=head_n, d_model=d_model, N_layers=N_layers, dropout=dropout) 
+    model = Predict_Model(Bert, token_size=len(dataset_4qs['vid_list']), head_n=head_n, d_model=d_model, N_layers=N_layers, dropout=dropout) 
     if Pretrained:
         print("Load Pretrained Predict Model")
         model.load_state_dict(torch.load('./pretrain/Predict_model_trained_ep34.pth'))
