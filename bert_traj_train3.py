@@ -41,18 +41,18 @@ def predict_train_epoch(epoch, model, train_data, train_queue, optimizer, device
     
     for i, batch_queue in enumerate(train_queue):
 
-        max_place = max([len(train_data[u][id]['loc']) for u,id in batch_queue]) 
-        max_history = max([len(train_data[u][id]['history_loc']) for u,id in batch_queue]) 
+        max_place = max([len(train_data[u][idx]['loc']) for u,idx in batch_queue]) 
+        max_history = max([len(train_data[u][idx]['history_loc']) for u,idx in batch_queue]) 
         
-        loc = torch.cat([pad_tensor(train_data[u][id]['loc'],max_place,0).unsqueeze(0) for u, id in batch_queue], dim=0).to(device).long()
-        time = torch.cat([pad_tensor(train_data[u][id]['tim'],max_place,0).unsqueeze(0) for u, id in batch_queue], dim=0).to(device).long()
-        loc_label = torch.cat([pad_tensor(train_data[u][id]['target_loc'],max_place,0).unsqueeze(0) for u, id in batch_queue], dim=0).to(device).long().contiguous().view(-1)
-        time_label = torch.cat([pad_tensor(train_data[u][id]['target_tim'],max_place,0).unsqueeze(0) for u, id in batch_queue], dim=0).to(device).long().contiguous().view(-1)
+        loc = torch.cat([pad_tensor(train_data[u][idx]['loc'],max_place,0).unsqueeze(0) for u, idx in batch_queue], dim=0).to(device).long()
+        time = torch.cat([pad_tensor(train_data[u][idx]['tim'],max_place,0).unsqueeze(0) for u, idx in batch_queue], dim=0).to(device).long()
+        loc_label = torch.cat([pad_tensor(train_data[u][idx]['target_loc'],max_place,0).unsqueeze(0) for u, idx in batch_queue], dim=0).to(device).long().contiguous().view(-1)
+        time_label = torch.cat([pad_tensor(train_data[u][idx]['target_tim'],max_place,0).unsqueeze(0) for u, idx in batch_queue], dim=0).to(device).long().contiguous().view(-1)
         
-        history_loc = torch.cat([before_pad_tensor(train_data[u][id]['history_loc'],max_history,0).unsqueeze(0) for u, id in batch_queue], dim=0).to(device).long()
-        history_time = torch.cat([before_pad_tensor(train_data[u][id]['history_tim'],max_history,0).unsqueeze(0) for u, id in batch_queue], dim=0).to(device).long()
+        history_loc = torch.cat([before_pad_tensor(train_data[u][idx]['history_loc'],max_history,0).unsqueeze(0) for u, idx in batch_queue], dim=0).to(device).long()
+        history_time = torch.cat([before_pad_tensor(train_data[u][idx]['history_tim'],max_history,0).unsqueeze(0) for u, idx in batch_queue], dim=0).to(device).long()
         
-        # his_len_traj = torch.from_numpy(np.array([train_data[u][id]['his_len_traj'] for u, id in batch_queue])).to(device).long()
+        # his_len_traj = torch.from_numpy(np.array([train_data[u][idx]['his_len_traj'] for u, idx in batch_queue])).to(device).long()
 
         input_loc = torch.cat([history_loc, loc], dim=1)
         input_tim = torch.cat([history_time, time], dim=1)
@@ -90,32 +90,32 @@ def predict_train_epoch(epoch, model, train_data, train_queue, optimizer, device
 
     return avg_loss, avg_acc, eva_metric/total_loc
 
-def predict_valid_epoch(epoch, model, valid_data, valid_queue, optimizer, device, batch_size):
+def predict_validx_epoch(epoch, model, validx_data, validx_queue, optimizer, device, batch_size):
 
     model.eval()
-    desc= ' -(Valid)- '
+    desc= ' -(Validx)- '
     total_loss, avg_loss, avg_acc = 0, 0, 0.
     iter_100_loss, iter_100_loc, iter_100_cor_loc, iter_100_cor_time= 0, 0, 0, 0
     total_loc, total_cor_loc = 0, 0
     eva_metric = np.zeros((6, 1))
 
-    len_queue = len(valid_queue)
+    len_queue = len(validx_queue)
     len_batch = int(np.ceil((len_queue/batch_size)))
-    valid_queue = [[valid_queue.popleft() for _ in range(min(batch_size, len(valid_queue)))] for k in range(len_batch)]
+    validx_queue = [[validx_queue.popleft() for _ in range(min(batch_size, len(validx_queue)))] for k in range(len_batch)]
     
     with torch.no_grad():
-        for i, batch_queue in enumerate(valid_queue):
+        for i, batch_queue in enumerate(validx_queue):
 
-            max_place = max([len(valid_data[u][id]['loc']) for u,id in batch_queue]) 
-            max_history = max([len(valid_data[u][id]['history_loc']) for u,id in batch_queue]) 
+            max_place = max([len(validx_data[u][idx]['loc']) for u,idx in batch_queue]) 
+            max_history = max([len(validx_data[u][idx]['history_loc']) for u,idx in batch_queue]) 
 
-            loc = torch.cat([pad_tensor(valid_data[u][id]['loc'],max_place,0).unsqueeze(0) for u, id in batch_queue], dim=0).to(device).long()
-            time = torch.cat([pad_tensor(valid_data[u][id]['tim'],max_place,0).unsqueeze(0) for u, id in batch_queue], dim=0).to(device).long()
-            loc_label = torch.cat([pad_tensor(valid_data[u][id]['target_loc'],max_place,0).unsqueeze(0) for u, id in batch_queue], dim=0).to(device).long().contiguous().view(-1)
-            time_label = torch.cat([pad_tensor(valid_data[u][id]['target_tim'],max_place,0).unsqueeze(0) for u, id in batch_queue], dim=0).to(device).long().contiguous().view(-1)
+            loc = torch.cat([pad_tensor(validx_data[u][idx]['loc'],max_place,0).unsqueeze(0) for u, idx in batch_queue], dim=0).to(device).long()
+            time = torch.cat([pad_tensor(validx_data[u][idx]['tim'],max_place,0).unsqueeze(0) for u, idx in batch_queue], dim=0).to(device).long()
+            loc_label = torch.cat([pad_tensor(validx_data[u][idx]['target_loc'],max_place,0).unsqueeze(0) for u, idx in batch_queue], dim=0).to(device).long().contiguous().view(-1)
+            time_label = torch.cat([pad_tensor(validx_data[u][idx]['target_tim'],max_place,0).unsqueeze(0) for u, idx in batch_queue], dim=0).to(device).long().contiguous().view(-1)
 
-            history_loc = torch.cat([before_pad_tensor(valid_data[u][id]['history_loc'],max_history,0).unsqueeze(0) for u, id in batch_queue], dim=0).to(device).long()
-            history_time = torch.cat([before_pad_tensor(valid_data[u][id]['history_tim'],max_history,0).unsqueeze(0) for u, id in batch_queue], dim=0).to(device).long()    
+            history_loc = torch.cat([before_pad_tensor(validx_data[u][idx]['history_loc'],max_history,0).unsqueeze(0) for u, idx in batch_queue], dim=0).to(device).long()
+            history_time = torch.cat([before_pad_tensor(validx_data[u][idx]['history_tim'],max_history,0).unsqueeze(0) for u, idx in batch_queue], dim=0).to(device).long()    
 
             input_loc = torch.cat([history_loc, loc], dim=1)
             input_tim = torch.cat([history_time, time], dim=1)
@@ -144,19 +144,19 @@ def predict_valid_epoch(epoch, model, valid_data, valid_queue, optimizer, device
     return avg_loss, avg_acc, eva_metric/total_loc
 
 
-def run(epoch, model, optimizer, device, train_data, train_traj_idx, valid_data, valid_traj_idx, log=None, batch_size=4):
-    # run(Epoch, model, optimizer, device, train_data, train_traj_idx, test_data, test_traj_idx, log=log)
+def run(epoch, model, optimizer, device, train_data, train_traj_idxx, validx_data, validx_traj_idxx, log=None, batch_size=4):
+    # run(Epoch, model, optimizer, device, train_data, train_traj_idxx, test_data, test_traj_idxx, log=log)
 
     # with SummaryWriter() as writer:
 
-    log_train_file, log_valid_file = None, None
+    log_train_file, log_validx_file = None, None
 
     if log:
         log_train_file = log + '.train.log'
-        log_valid_file = log + '.valid.log'
+        log_validx_file = log + '.validx.log'
         # print('[Info] Training performance will be written to file: {} and {}'.format(
-        #     log_train_file, log_valid_file))
-        with open(log_train_file, 'a') as log_tf, open(log_valid_file, 'a') as log_vf:
+        #     log_train_file, log_validx_file))
+        with open(log_train_file, 'a') as log_tf, open(log_validx_file, 'a') as log_vf:
             log_tf.write("\n# Note: .\n")
             log_vf.write("\n# Note: .\n")
             log_tf.write("Start Time: {}.\n".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
@@ -164,32 +164,32 @@ def run(epoch, model, optimizer, device, train_data, train_traj_idx, valid_data,
         
     for epoch_i in range(1, epoch+1):
         
-        train_queue = generate_queue(train_traj_idx,'random','train')
-        valid_queue = generate_queue(valid_traj_idx,'normal','valid') 
+        train_queue = generate_queue(train_traj_idxx,'random','train')
+        validx_queue = generate_queue(validx_traj_idxx,'normal','validx') 
 
         train_avg_loss, train_acc, train_metric = predict_train_epoch(epoch_i, model, train_data, train_queue, optimizer, device, batch_size)
-        valid_avg_loss, valid_acc, valid_metric = predict_valid_epoch(epoch_i, model, valid_data, valid_queue, optimizer, device, batch_size)
+        validx_avg_loss, validx_acc, validx_metric = predict_validx_epoch(epoch_i, model, validx_data, validx_queue, optimizer, device, batch_size)
         print('-'*150)
         print(" --Train--  Epoch: {}/{}  Train_avg_loss: {:<10.7f} Train_acc: {:<4.4f}".format(epoch_i, epoch, train_avg_loss, train_acc))
-        print(" --Valid--  Epoch: {}/{}  Valid_avg_loss: {:<10.7f} Valid_acc: {:<4.4f}".format(epoch_i, epoch, valid_avg_loss, valid_acc))
+        print(" --Validx--  Epoch: {}/{}  Validx_avg_loss: {:<10.7f} Validx_acc: {:<4.4f}".format(epoch_i, epoch, validx_avg_loss, validx_acc))
         print('-'*150)
         print(" --Train--  Epoch: {}/{}  Metric: {:<4.4f} \ {:<4.4f} \ {:<4.4f} \ {:<4.4f} \ {:<4.4f} \ {:<4.4f}".format(epoch_i, epoch, train_metric[0][0], train_metric[1][0], train_metric[2][0], train_metric[3][0], train_metric[4][0], train_metric[5][0]))
-        print(" --Valid--  Epoch: {}/{}  Metric: {:<4.4f} \ {:<4.4f} \ {:<4.4f} \ {:<4.4f} \ {:<4.4f} \ {:<4.4f}".format(epoch_i, epoch, valid_metric[0][0], valid_metric[1][0], valid_metric[2][0], valid_metric[3][0], valid_metric[4][0], valid_metric[5][0]))
+        print(" --Validx--  Epoch: {}/{}  Metric: {:<4.4f} \ {:<4.4f} \ {:<4.4f} \ {:<4.4f} \ {:<4.4f} \ {:<4.4f}".format(epoch_i, epoch, validx_metric[0][0], validx_metric[1][0], validx_metric[2][0], validx_metric[3][0], validx_metric[4][0], validx_metric[5][0]))
         print('-'*150)
         # exit()
         # *********************************************************************
         
-        if log_train_file and log_valid_file:
-            with open(log_train_file, 'a') as log_tf, open(log_valid_file, 'a') as log_vf:
+        if log_train_file and log_validx_file:
+            with open(log_train_file, 'a') as log_tf, open(log_validx_file, 'a') as log_vf:
                 log_tf.write(" --Train--  Epoch: {}/{}  Train_avg_loss: {} Train_acc: {}\n".format(epoch_i, epoch, train_avg_loss, train_acc))
-                log_vf.write(" --Valid--  Epoch: {}/{}  Valid_avg_loss: {} Valid_acc: {}\n".format(epoch_i, epoch, valid_avg_loss, valid_acc)) 
+                log_vf.write(" --Validx--  Epoch: {}/{}  Validx_avg_loss: {} Validx_acc: {}\n".format(epoch_i, epoch, validx_avg_loss, validx_acc)) 
         
         # if epoch_i % 2==0:
         #     save_model(epoch_i, model, Predict=True)
         #     print("The step is {} .".format(optimizer._print_step()))
         #     print('-'*150)
-            # writer.add_scalars("Loss", {"Train": train_total_loss, "Valid": valid_total_loss}, epoch_i)
-            # writer.add_scalars("Acc", {"Train": train_epoch_acc, "Valid": valid_epoch_acc}, epoch_i)
+            # writer.add_scalars("Loss", {"Train": train_total_loss, "Validx": validx_total_loss}, epoch_i)
+            # writer.add_scalars("Acc", {"Train": train_epoch_acc, "Validx": validx_epoch_acc}, epoch_i)
             # writer.add_scalars("Lr", {"Train": optimizer._print_lr()}, epoch_i)
 
 
@@ -198,7 +198,7 @@ def main(Epoch=200, Bert_Pretrain=False, Batch_size=10, Pretrained=False, log='p
     head_n = 10
     d_model = 500
     N_layers = 10
-    dropout = 0.5
+    dropout = 0.4
 
     # head_n = 10
     # d_model = 400
@@ -210,22 +210,22 @@ def main(Epoch=200, Bert_Pretrain=False, Batch_size=10, Pretrained=False, log='p
     print("Device:", device)
     print("Get Dataset")
     dataset_4qs = pickle.load(open('./data/tweets-cikm.txtfoursquare.pk', 'rb'))
-    print("User number: ", len(dataset_4qs['uid_list']))
+    print("User number: ", len(dataset_4qs['uidx_list']))
     print("Generate Train_traj_list")
-    train_data, train_traj_idx = generate_input_history(data_neural=dataset_4qs["data_neural"], mode="train")
-    print("Generate Valid_traj_list")
-    test_data, test_traj_idx = generate_input_history(data_neural=dataset_4qs["data_neural"], mode="test")
+    train_data, train_traj_idxx = generate_input_history(data_neural=dataset_4qs["data_neural"], mode="train")
+    print("Generate Validx_traj_list")
+    test_data, test_traj_idxx = generate_input_history(data_neural=dataset_4qs["data_neural"], mode="test")
 
     if Bert_Pretrain:
         print("Loaded Pretrained Bert")      
-        Bert = Bert_Traj_Model(token_size=len(dataset_4qs['vid_list']), head_n=head_n, d_model=d_model, N_layers=N_layers, dropout=dropout)
+        Bert = Bert_Traj_Model(token_size=len(dataset_4qs['vidx_list']), head_n=head_n, d_model=d_model, N_layers=N_layers, dropout=dropout)
         Bert.load_state_dict(torch.load('./pretrain/bert_trained_ep14.pth')) 
     else: 
         print("Create New Bert")      
-        Bert = Bert_Traj_Model(token_size=len(dataset_4qs['vid_list']), head_n=head_n, d_model=d_model, N_layers=N_layers, dropout=dropout)
+        Bert = Bert_Traj_Model(token_size=len(dataset_4qs['vidx_list']), head_n=head_n, d_model=d_model, N_layers=N_layers, dropout=dropout)
 
     print("Get Predict Model")
-    model = Predict_Model(Bert, token_size=len(dataset_4qs['vid_list']), head_n=head_n, d_model=d_model, N_layers=N_layers, dropout=dropout) 
+    model = Predict_Model(Bert, token_size=len(dataset_4qs['vidx_list']), head_n=head_n, d_model=d_model, N_layers=N_layers, dropout=dropout) 
     if Pretrained:
         print("Load Pretrained Predict Model")
         model.load_state_dict(torch.load('./pretrain/Predict_model_trained_ep34.pth'))
@@ -238,7 +238,7 @@ def main(Epoch=200, Bert_Pretrain=False, Batch_size=10, Pretrained=False, log='p
         init_lr=2, d_model=768, n_warmup_steps=4000)
     print('*'*150)
     print('-'*65 + "  START TRAIN  " + '-'*65)
-    run(Epoch, model, optimizer, device, train_data, train_traj_idx, test_data, test_traj_idx, log, Batch_size)
+    run(Epoch, model, optimizer, device, train_data, train_traj_idxx, test_data, test_traj_idxx, log, Batch_size)
 
 if __name__ == "__main__":
     main()
